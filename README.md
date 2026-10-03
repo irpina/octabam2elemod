@@ -14,12 +14,14 @@ Octatrack MKI and MKII on **OS 1.40C**.
   repository only converts it, and makes no claim on it. Problems with a mod's
   behaviour that also happen in octabam's own build belong upstream.
 
-> **On a unit so far: they boot, and that is all that has been checked.** On an
-> Octatrack MKII, 19 of these mods boot with the core (see
-> [On a unit](#on-a-unit)). Their features have not been tested on a unit yet.
-> The other 15 USB layouts have not been run on one at all, and nothing has
-> run on an MKI. Keep your stock OS file, and read [Recovery](#recovery)
-> before you flash.
+> **On a unit so far** (an Octatrack MKII, 3 Oct 2026; details under
+> [On a unit](#on-a-unit)):
+> - **Tested in use, all working:** 15 mods.
+> - **Boot, not yet tested in use:** 4 more.
+> - **Not yet run on a unit:** the other 15 USB layouts.
+>
+> Nothing has run on an MKI. Keep your stock OS file, and read
+> [Recovery](#recovery) before you flash.
 
 ## Use them
 
@@ -133,18 +135,23 @@ and each booted showing its own version:
 | T4 | SCENES P2 |
 | T5 | USB AUDIO OUT TRACKS MAIN CUE, USB CROSSBAR |
 | T6 | USB IO TRACKS MAIN CUE AB |
-| T7 | all of the above together, except SCENES P2 |
+| T7 | the 14 non-USB mods but SCENES P2, and USB IO TRACKS MAIN CUE AB |
 
 They were built from this release's files and elekloader 0.4.0's core.
 
-What that does not cover:
-- **Features.** Only the boot was checked so far. Each mod's feature checks
-  are still to do.
-- **The other 15 USB layouts.** The other four USB AUDIO OUT layouts and the
-  other eleven USB IO combinations have not been flashed yet.
-- **An MKI.** Nothing here has run on one.
+**Then T7 was tested in use** (the checks in the test plan), and everything
+worked. So, mod by mod:
 
-This section grows as checks pass. The shop's cards say the same for each mod.
+| status | mods |
+|---|---|
+| **tested in use, all working** | TUNER, SYNTH MACHINE, SCALE QUANTIZER, REPITCH, DIRECT JUMP, RLEN PLEN, MIDI SCENES, CC MAP, CC FEEDBACK, RECORDER HOLD, RECORDER SPACING, FLEX SEEK BIND, FLEX SEEK BIND CTR, LOFI AMF FIX, USB IO TRACKS MAIN CUE AB |
+| **boots, not yet tested in use** | SCENES P2, USB MIDI, USB CROSSBAR, USB AUDIO OUT TRACKS MAIN CUE. The last three are also part of USB IO TRACKS MAIN CUE AB, which was tested; these files on their own were only booted. |
+| **not yet run on a unit** | USB AUDIO OUT TRACKS, MAIN CUE, MAIN and MASTER, and the eleven other USB IO combinations |
+
+Nothing here has run on an MKI.
+
+This section grows as checks pass. The shop's details sheet says the same for
+each mod.
 
 To make them yourself, see [`convert.sh`](convert.sh).
 
