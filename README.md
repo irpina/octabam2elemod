@@ -14,9 +14,12 @@ Octatrack MKI and MKII on **OS 1.40C**.
   repository only converts it, and makes no claim on it. Problems with a mod's
   behaviour that also happen in octabam's own build belong upstream.
 
-> **None of these mods has been run on an Octatrack yet.** They pass the
-> checks below, in octabam's own emulator, but that is not a unit. Keep your
-> stock OS file, and read [Recovery](#recovery) before you flash.
+> **On a unit so far: they boot, and that is all that has been checked.** On an
+> Octatrack MKII, 19 of these mods boot with the core (see
+> [On a unit](#on-a-unit)). Their features have not been tested on a unit yet.
+> The other 15 USB layouts have not been run on one at all, and nothing has
+> run on an MKI. Keep your stock OS file, and read [Recovery](#recovery)
+> before you flash.
 
 ## Use them
 
@@ -114,7 +117,34 @@ address, and every patch site holds what octabam's build would write there.
     bit-exact, and the jacks return when the stream closes.
 
 What this cannot show is anything a real unit adds: timing, a real host,
-long sessions. That is what a first flash will tell.
+long sessions.
+
+## On a unit
+
+**3 Oct 2026, an Octatrack MKII.** Eight builds were flashed from the card,
+and each booted showing its own version:
+
+| build | what it carried |
+|---|---|
+| T0 | the core alone |
+| T1 | FLEX SEEK BIND, FLEX SEEK BIND CTR, RECORDER HOLD, RECORDER SPACING, LOFI AMF FIX, RLEN PLEN, DIRECT JUMP |
+| T2 | USB MIDI, CC MAP, CC FEEDBACK, MIDI SCENES |
+| T3 | TUNER, SYNTH MACHINE, SCALE QUANTIZER, REPITCH |
+| T4 | SCENES P2 |
+| T5 | USB AUDIO OUT TRACKS MAIN CUE, USB CROSSBAR |
+| T6 | USB IO TRACKS MAIN CUE AB |
+| T7 | all of the above together, except SCENES P2 |
+
+They were built from this release's files and elekloader 0.4.0's core.
+
+What that does not cover:
+- **Features.** Only the boot was checked so far. Each mod's feature checks
+  are still to do.
+- **The other 15 USB layouts.** The other four USB AUDIO OUT layouts and the
+  other eleven USB IO combinations have not been flashed yet.
+- **An MKI.** Nothing here has run on one.
+
+This section grows as checks pass. The shop's cards say the same for each mod.
 
 To make them yourself, see [`convert.sh`](convert.sh).
 
