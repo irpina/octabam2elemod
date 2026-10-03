@@ -2,7 +2,9 @@
 # How this repository's .elemod files were made, to make them again.
 #
 # Needs (Linux or WSL):
-#   - an elekloader checkout (https://github.com/irpina/elekloader), main;
+#   - an elekloader checkout (https://github.com/irpina/elekloader), main with
+#     irpina/elekloader#30 in it: the converter that made these files, byte
+#     for byte (an older one gives the same code, with other category names);
 #   - an octabam checkout at the commit below, with its submodules, and its
 #     `make setup` done: the USB IO remixes run octabam's own build, which
 #     needs its DSP assembler (vendor/dsp56300 .../dsp_asm);
