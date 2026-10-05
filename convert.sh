@@ -14,6 +14,11 @@
 #
 #   ./convert.sh ELEKLOADER OCTABAM OCTATRACK_OS1.40C.syx OUT
 #
+# v1.1's files come from the converter's --bus (elekloader with
+# irpina/elekloader#42): the 20 mods whose hooks the Octatrack core's hook
+# bus serves are made as <module>-363861e-bus, and the other 14 exactly as
+# without it (v1.0's files, byte for byte). Leave --bus out for v1.0's.
+#
 # OUT gets one folder and one .elemod per mod, plus the core (OUT/core). Every
 # line of output says CONVERTED (with what was checked), REFUSED or FAILED.
 # The .elemod files carry no Elektron bytes, but OUT's folders carry octabam's
@@ -29,8 +34,8 @@ export ELEKLOADER_CROSS=m68k-elf-
 
 cd "$EL"
 # the 22 modules that convert on their own (the rest are refused, with the reason)
-python3 -m elekloader.sdk.octabam --octabam "$OB" --stock "$STOCK" --out "$OUT"
+python3 -m elekloader.sdk.octabam --octabam "$OB" --stock "$STOCK" --out "$OUT" --bus
 # USB AUDIO IN converts only as part of a remix: octabam's twelve usb-io remixes
 remixes=()
 for r in $(ls "$OB/remixes/test" | grep '^usb-io-'); do remixes+=(--remix "$r"); done
-python3 -m elekloader.sdk.octabam --octabam "$OB" --stock "$STOCK" --out "$OUT" "${remixes[@]}"
+python3 -m elekloader.sdk.octabam --octabam "$OB" --stock "$STOCK" --out "$OUT" --bus "${remixes[@]}"

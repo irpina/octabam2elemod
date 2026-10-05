@@ -5,7 +5,8 @@
 Octatrack MKI and MKII on **OS 1.40C**.
 
 - **What they are.** 34 mods, converted from octabam commit `363861e` (30 Sep
-  2026) by elekloader's converter.
+  2026) by elekloader's converter. From v1.1, 20 of them run on the Octatrack
+  core's hook bus ([v1.1: the hook bus](#v11-the-hook-bus)).
 - **Where they are.** The files are in this repository's
   [releases](https://github.com/irpina/octabam2elemod/releases). They are also in
   the mod shop on elekloader's [web page](https://irpina.github.io/elekloader/).
@@ -19,6 +20,8 @@ Octatrack MKI and MKII on **OS 1.40C**.
 > - **Tested in use, all working:** 15 mods.
 > - **Boot, not yet tested in use:** 4 more.
 > - **Not yet run on a unit:** the other 15 USB layouts.
+> - **v1.1's `-bus` files:** not yet run on a unit (the results above are
+>   v1.0's).
 >
 > Nothing has run on an MKI. Keep your stock OS file, and read
 > [Recovery](#recovery) before you flash.
@@ -28,13 +31,17 @@ Octatrack MKI and MKII on **OS 1.40C**.
 1. Get your stock OS from Elektron: `OCTATRACK_OS1.40C.syx` (or the `.zip` it
    comes in).
 2. Open elekloader, either the [web page](https://irpina.github.io/elekloader/)
-   or the desktop app (0.4.0 or later). Add the stock file, then add mods from
-   the shop or from the `.elemod` files here. Then build.
+   or the desktop app. Add the stock file, then add mods from the shop or
+   from the `.elemod` files here. Then build.
 3. Flash the `.syx` it gives you as any OS update, or put the `.bin` on the
    card.
 
-Every mod here needs the Octatrack core (`core-ot-0.1.elemod`). elekloader
-includes it and ticks it for you.
+Every mod here needs the Octatrack core. elekloader includes it and ticks it
+for you.
+- **The 20 `-bus` files** need core 0.2 or newer (`core-ot-0.2.elemod`).
+  That means an elekloader that carries it: with core 0.1 they are refused
+  ("adds to table ev_frame, which no given mod declares").
+- **The other 14** work with core 0.1 or newer.
 
 ### Which USB mod
 
@@ -60,6 +67,31 @@ on macOS. It has not been measured with Windows or Linux hosts.
 Everything else combines freely, with one exception: MIDI SCENES and SCENES
 P2 keep data in the same bytes of every Part, so they are refused together
 (octabam refuses the same pair).
+
+## v1.1: the hook bus
+
+The Octatrack core 0.2 has a hook bus: events that mods subscribe to instead
+of each patching the firmware (a 60 Hz tick, the screen, the keys, the
+encoders, MIDI in, the audio frame). v1.1 converts the modules that hooked
+those same routines onto it:
+
+| mod | its hook | now |
+|---|---|---|
+| TUNER | the audio frame interrupt's tail; the UI task's loop | `ev_frame`; `ev_tick` |
+| CC FEEDBACK | the 120 Hz key-repeat task | `ev_tick`, two sweeps a tick, so the same rate |
+| CC MAP | the CC entry of the MIDI dispatch | `ev_midi`: it takes CC 62-73, and the rest go on to the firmware as before |
+| USB AUDIO OUT (5) and USB IO (12) | the audio producer in the frame interrupt | `ev_frame` |
+
+TUNER's UP + TEMPO hook and the USB mods' other hooks are not bus events, so
+they stay as they were.
+
+- **The code is octabam's**, unchanged but for the one jump back into the
+  firmware at the end of TUNER's and USB's hook code, which now returns to
+  the bus. Generated glue calls it.
+- **The other 14 mods are the v1.0 files**, byte for byte.
+- **v1.0 stays published.** Its 20 non-bus files of these mods still work
+  with core 0.1 or 0.2. A v1.0 and a v1.1 file of one module are refused
+  together.
 
 ## The mods
 
@@ -89,8 +121,10 @@ P2 keep data in the same bytes of every Part, so they are refused together
 | `octabam-usb-audio-out-master` | 2 channels: track 8, the master track | Mark Roberts, Sam Banks |
 | `octabam-usb-io-<out>-<in>` (12) | a USB audio out layout above (`tracks-main-cue`, `tracks`, `main-cue` or `main`), plus the computer's audio into inputs A/B (`ab`), C/D (`cd`) or A to D (`abcd`, 4 channels). While the computer's stream is closed, the inputs are the jacks again. | Mark Roberts, Bryan T |
 
-Each file is named `octabam-<module>-363861e.elemod`. The audio-out mods each
-include USB MIDI.
+Each file is named `octabam-<module>-363861e.elemod`, or
+`octabam-<module>-363861e-bus.elemod` for the 20 on the hook bus (TUNER, CC
+FEEDBACK, CC MAP, the 5 audio-out and the 12 usb-io mods). The audio-out mods
+each include USB MIDI.
 
 ## How they were made, and what was checked
 
@@ -117,6 +151,22 @@ address, and every patch site holds what octabam's build would write there.
     full speed, MIDI both ways;
   - `verify_usb_in` (the 12 `usb-io`): the computer's samples reach the inputs
     bit-exact, and the jacks return when the stream closes.
+
+- **The hook bus (v1.1).** For each hook on the bus, the converter's check
+  proves, by the bytes:
+  - its site is left stock and its glue is subscribed;
+  - a rewritten source assembles to octabam's bytes but for its jump back
+    into the firmware;
+  - CC MAP's code equals octabam's but for where it passes a CC on.
+
+  Then, in octabam's emulator:
+  - the USB gates above pass again on all 17 `-bus` USB mods;
+  - TUNER, CC MAP and CC FEEDBACK do the same as their v1.0 files, run
+    side by side on one script:
+    - the same CCs taken and passed on;
+    - CC FEEDBACK sweeping as often;
+    - TUNER's hook on every frame;
+    - an identical screen with the tuner open.
 
 What this cannot show is anything a real unit adds: timing, a real host,
 long sessions.
@@ -149,6 +199,10 @@ worked. So, mod by mod:
 | **not yet run on a unit** | USB AUDIO OUT TRACKS, MAIN CUE, MAIN and MASTER, and the eleven other USB IO combinations |
 
 Nothing here has run on an MKI.
+
+**v1.1.** The `-bus` files have not run on a unit yet. Their test builds
+carry T2, T3, T5, T6 and T7's sets in their v1.1 form, on core 0.2. Until
+those pass, the results above are v1.0's.
 
 This section grows as checks pass. The shop's details sheet says the same for
 each mod.
